@@ -1,0 +1,124 @@
+/* Modern Styling with Cairo Font & MilMail Brand Identity */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    /* ألوان هوية اللوقو الرسمية */
+    --brand-dark: #003038;       /* الكحلي الغامق / الأخضر الداكن العميق */
+    --brand-teal: #056676;       /* التركواز الهادئ */
+    --brand-teal-light: #e6f4f5; /* خلفية ناعمة من لون اللوقو */
+    --brand-accent: #00a896;     /* أخضر مائي حيوي */
+    --brand-gold: #f59e0b;       /* ذهبي لميزات الـ Pro */
+    
+    --bg-page: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+}
+
+body {
+    font-family: 'Cairo', system-ui, -apple-system, sans-serif !important;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    letter-spacing: -0.01em;
+}
+
+/* أنيميشن ناعم وجذاب */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* خلفية جمالية حديثة مع تدرج خفيف */
+.hero-gradient-bg {
+    background: radial-gradient(circle at 50% 10%, rgba(5, 102, 118, 0.08) 0%, rgba(248, 250, 252, 0) 65%);
+}
+
+/* بطاقات وتأثيرات متناسقة مع اللوقو */
+.brand-card {
+    background: #ffffff;
+    border: 1px solid rgba(5, 102, 118, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px -2px rgba(0, 48, 56, 0.04);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -5px rgba(0, 48, 56, 0.12);
+    border-color: rgba(5, 102, 118, 0.3);
+}
+
+.brand-btn {
+    background: linear-gradient(135deg, #003038 0%, #056676 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 48, 56, 0.2);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 48, 56, 0.3);
+    background: linear-gradient(135deg, #002228 0%, #034f5c 100%);
+}
+
+.brand-btn-outline {
+    border: 1.5px solid rgba(5, 102, 118, 0.35);
+    color: var(--brand-dark);
+    transition: all 0.25s ease;
+}
+
+.brand-btn-outline:hover {
+    background: var(--brand-teal-light);
+    border-color: var(--brand-teal);
+    transform: translateY(-2px);
+}
+
+/* تنسيق حقول الإدخال */
+.brand-input {
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+}
+
+.brand-input:focus {
+    border-color: var(--brand-teal);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(5, 102, 118, 0.15);
+}
+
+/* مساحات الإعلانات */
+.ad-slot-container {
+    background: #ffffff;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    position: relative;
+}
+
+.ad-badge {
+    position: absolute;
+    top: 6px;
+    left: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #94a3b8;
+}

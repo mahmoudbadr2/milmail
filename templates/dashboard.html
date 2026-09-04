@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - MilMail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ settings.ADSENSE_CLIENT_ID }}" crossorigin="anonymous"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-['Cairo']">
+
+    <!-- Header -->
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <a href="/">
+                    <img src="/static/logo.png" alt="MilMail Logo" class="h-14 object-contain">
+                </a>
+                <div class="mr-3">
+                    {% if user.is_pro %}
+                        <span class="bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-sm">PRO 👑</span>
+                    {% else %}
+                        <span class="bg-slate-100 text-slate-700 text-[11px] font-bold px-2.5 py-1 rounded-full border border-slate-200">مجاني (2 إيميل كحد أقصى)</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <span class="text-xs text-slate-500 font-medium hidden sm:inline">{{ user.email }}</span>
+                {% if not user.is_pro %}
+                    <button onclick="upgradeToPro()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5">
+                        <span>ترقية إلى Pro 👑</span>
+                    </button>
+                {% endif %}
+                <a href="/logout" class="text-xs font-bold text-red-600 hover:underline">خروج</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Dashboard Ad Slot (Hidden if Pro) -->
+    {% include "ads_component.html" %}
+
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
+
+        <!-- Top Stats & Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="brand-card p-6 border-r-4 border-[#003038]">
+                <span class="text-xs font-bold text-slate-400 block mb-1">البريد المستعار المستخدم</span>
+                <div class="flex items-baseline justify-between">
+                    <span class="text-3xl font-black text-[#003038]">{{ aliases_count }} / {% if user.is_pro %}غير محدود{% else %}2{% endif %}</span>
+                    <span class="text-xs font-bold {% if can_create_more %}text-emerald-600{% else %}text-red-500{% endif %}">
+                        {% if can_create_more %}متاح إنشاء جديد{% else %}وصلت للحد الأقصى (2){% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="brand-card p-6 border-r-4 border-[#056676]">
+                <span class="text-xs font-bold text-slate-400 block mb-1">وجهة التحويل الأساسية</span>
+                <span class="text-sm font-bold text-slate-800 truncate block">{{ user.email }}</span>
+                <span class="text-[11px] text-slate-400 mt-1 block">كل الرسائل تصل هنا بأمان تام</span>
+            </div>
+
+            <div class="brand-card p-6 border-r-4 border-amber-500 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 block mb-1">حالة الباقة الحالية</span>
+                    <span class="text-sm font-black text-slate-900">{% if user.is_pro %}باقة Pro غير محدودة 👑{% else %}الباقة المجانية (إيميلين فقط){% endif %}</span>
+                </div>
+                {% if not user.is_pro %}
+                    <a href="javascript:void(0)" onclick="upgradeToPro()" class="text-xs font-bold text-[#056676] hover:underline mt-2 inline-block">
+                        احصل على إيميلات غير محدودة وبدون إعلانات ←
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Create New Alias Section -->
+        <div class="brand-card p-6 mb-8">
+            <h2 class="text-lg font-bold text-[#003038] mb-4 flex items-center gap-2">
+                <span>➕</span>
+                <span>توليد بريد مستعار جديد</span>
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">بادئة مخصصة (اختياري)</label>
+                    <input type="text" id="aliasPrefix" placeholder="مثال: shopping, netflix" class="w-full brand-input text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">وصف أو ملاحظة (اختياري)</label>
+                    <input type="text" id="aliasDescription" placeholder="مثال: للتسجيل في متجر أمازون" class="w-full brand-input text-sm">
+                </div>
+                <div class="flex items-end">
+                    {% if can_create_more %}
+                        <button id="createAliasBtn" onclick="createAlias()" class="w-full brand-btn font-bold py-3 px-4 rounded-xl text-sm shadow-md">
+                            توليد بريد مستعار ✨
+                        </button>
+                    {% else %}
+                        <button onclick="upgradeToPro()" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-xl text-sm hover:bg-amber-600 shadow-md">
+                            ترقية إلى Pro للتوليد 🚀
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% if not can_create_more %}
+                <p class="text-xs text-amber-600 font-bold mt-3 bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                    ⚠️ لقد استنفدت الحد المسموح به في الخطة المجانية (2 إيميل فقط). قم بالترقية إلى Pro للاستمتاع بإنشاء إيميلات غير محدودة وحجب الإعلانات!
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Aliases List Section -->
+        <div class="brand-card overflow-hidden shadow-sm">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                <h3 class="font-bold text-[#003038] text-base">عناوين البريد المستعارة الخاصة بك</h3>
+                <span class="text-xs text-slate-500 font-semibold">إجمالي: {{ aliases_count }} / {% if user.is_pro %}∞{% else %}2{% endif %}</span>
+            </div>
+
+            {% if aliases %}
+                <div class="divide-y divide-slate-100">
+                    {% for alias in aliases %}
+                        <div class="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-slate-50/70 transition">
+                            <div class="flex items-center space-x-3 space-x-reverse">
+                                <div class="w-3 h-3 rounded-full {% if alias.is_active %}bg-emerald-500 shadow-sm shadow-emerald-200{% else %}bg-slate-300{% endif %}"></div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono font-bold text-sm text-slate-900">{{ alias.alias_email }}</span>
+                                        <button onclick="copyToClipboard('{{ alias.alias_email }}', this)" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded-md transition flex items-center">
+                                            نسخ
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-xs text-slate-500 mt-1 font-medium">
+                                        <span>📝 {{ alias.description }}</span>
+                                        <span>•</span>
+                                        <span>📅 {{ alias.created_at.strftime('%Y-%m-%d') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 space-x-reverse w-full sm:w-auto justify-end">
+                                <button onclick="toggleAlias({{ alias.id }}, {{ 'true' if alias.is_active else 'false' }})" class="text-xs font-bold px-3 py-1.5 rounded-lg border transition {% if alias.is_active %}border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100{% else %}border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100{% endif %}">
+                                    {% if alias.is_active %}إيقاف مؤقت ⏸️{% else %}تفعيل 🟢{% endif %}
+                                </button>
+                                <button onclick="deleteAlias({{ alias.id }})" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 transition">
+                                    حذف 🗑️
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="py-12 text-center text-slate-400">
+                    <span class="text-4xl block mb-2">📫</span>
+                    <p class="text-sm font-bold text-slate-600">لم تقم بتوليد أي بريد مستعار بعد.</p>
+                    <p class="text-xs mt-1 text-slate-400 font-medium">اضغط على زر التوليد في الأعلى لإنشاء أول بريد وحماية هويتك!</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </main>
+
+    <!-- Bottom Dashboard Ad Slot (Hidden if Pro) -->
+    {% include "ads_component.html" %}
+
+    <footer class="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
+        <p>© 2026 MilMail (minmail.pro) — حماية الخصوصية الرقمية</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
