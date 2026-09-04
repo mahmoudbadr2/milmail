@@ -21,19 +21,31 @@ from app.email_service import (
     toggle_cloudflare_rule, delete_cloudflare_rule
 )
 
+import os
+from pathlib import Path
+
+# تحديد المسار الجذري للمشروع بدقة للعمل في البيئات السحابية (Vercel Serverless)
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
 # إنشاء محدد المعدل للحماية من هجمات الإغراق (Rate Limiting)
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title=settings.PROJECT_NAME)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# ربط الملفات الثابتة والقوالب
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# ربط الملفات الثابتة والقوالب بمساراتها المطلقة
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-@app.on_event("startup")
-def on_startup():
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+# تشغيل قاعدة البيانات تلقائياً
+try:
     init_db()
+except Exception:
+    pass
 
 # ترويسات الأمان المتقدمة (Security Headers Middleware)
 @app.middleware("http")
