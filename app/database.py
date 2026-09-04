@@ -1,9 +1,14 @@
+import os
 import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
-DATABASE_URL = "sqlite:///./minmail.db"
+# في بيئة Vercel السحابية، مجلد /tmp هو الوحيد المتاح للكتابة
+if os.environ.get("VERCEL"):
+    DATABASE_URL = "sqlite:////tmp/minmail.db"
+else:
+    DATABASE_URL = "sqlite:///./minmail.db"
 
 engine = create_engine(
     DATABASE_URL, 
